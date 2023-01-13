@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_timer/picker/picker.dart';
 import 'package:flutter_timer/ticker.dart';
-import 'package:flutter_timer/timer/bloc/timer_bloc.dart';
-import 'package:flutter_timer/timer/picker_cubit.dart';
 import 'package:flutter_timer/timer/timer.dart';
 
 class TimerPage extends StatelessWidget {
@@ -15,7 +14,7 @@ class TimerPage extends StatelessWidget {
           create: (_) => TimerBloc(ticker: Ticker()),
         ),
         BlocProvider(
-          create: (context) => PickerCubit(),
+          create: (context) => PickerBloc(),
         ),
       ],
       child: const TimerView(),
@@ -27,7 +26,7 @@ class TimerView extends StatelessWidget {
   const TimerView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    PickerCubit myPicker = context.read<PickerCubit>();
+    PickerBloc myPicker = context.read<PickerBloc>();
     return Scaffold(
       appBar: AppBar(title: const Text('Flutter Timer')),
       body: BlocBuilder<TimerBloc, TimerState>(
@@ -45,16 +44,19 @@ class TimerView extends StatelessWidget {
                     height: 220,
                     child: ListWheelScrollView.useDelegate(
                       physics: const FixedExtentScrollPhysics(),
-                      controller: FixedExtentScrollController(initialItem: myPicker.state['hours'] != 0 ? myPicker.state['hours'] : 0),
+                      controller: FixedExtentScrollController(
+                          initialItem: myPicker.state.hours != 0
+                              ? myPicker.state.hours
+                              : 0),
                       onSelectedItemChanged: ((value) {
-                        myPicker.setHours(value);
+                        // add event
+                        myPicker.add(PickerHoursChanged(value));
                       }),
                       itemExtent: 50,
                       overAndUnderCenterOpacity: 0.2,
                       childDelegate: ListWheelChildBuilderDelegate(
                         childCount: 24,
                         builder: (context, index) {
-                          
                           return TimePicker(num: index);
                         },
                       ),
@@ -65,9 +67,12 @@ class TimerView extends StatelessWidget {
                     height: 220,
                     child: ListWheelScrollView.useDelegate(
                       physics: const FixedExtentScrollPhysics(),
-                      controller: FixedExtentScrollController(initialItem: myPicker.state['minutes'] != 0 ? myPicker.state['minutes'] : 0),
+                      controller: FixedExtentScrollController(
+                          initialItem: myPicker.state.minutes != 0
+                              ? myPicker.state.minutes
+                              : 0),
                       onSelectedItemChanged: ((value) {
-                        myPicker.setMinutes(value);
+                        myPicker.add(PickerMinutesChanged(value));
                       }),
                       itemExtent: 50,
                       overAndUnderCenterOpacity: 0.2,
@@ -84,9 +89,12 @@ class TimerView extends StatelessWidget {
                     height: 220,
                     child: ListWheelScrollView.useDelegate(
                       physics: const FixedExtentScrollPhysics(),
-                      controller: FixedExtentScrollController(initialItem: myPicker.state['seconds'] != 0 ? myPicker.state['seconds'] : 0),
+                      controller: FixedExtentScrollController(
+                          initialItem: myPicker.state.seconds != 0
+                              ? myPicker.state.seconds
+                              : 0),
                       onSelectedItemChanged: ((value) {
-                        myPicker.setSeconds(value);
+                        myPicker.add(PickerSecondsChanged(value));
                       }),
                       itemExtent: 50,
                       overAndUnderCenterOpacity: 0.2,
@@ -110,7 +118,7 @@ class TimerView extends StatelessWidget {
 
 class TimerText extends StatelessWidget {
   const TimerText({Key? key}) : super(key: key);
-  @override
+  @override ///////
   Widget build(BuildContext context) {
     final duration = context.select((TimerBloc bloc) => bloc.state.duration);
     final hoursStr = (duration / (60 * 60)).floor().toString().padLeft(2, '0');
@@ -139,18 +147,23 @@ class Actions extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               if (state is TimerInitial || state is TimerRunComplete) ...[
-                BlocBuilder<PickerCubit, Map<String, dynamic>>(
+                BlocBuilder<PickerBloc, PickerState>(
                   builder: (context, state) {
                     return FloatingActionButton(
-                      backgroundColor:
-                          state['hours'] != 0 || state['minutes'] != 0 || state['seconds'] != 0  ? Colors.blue : Colors.blue.shade200,
+                      backgroundColor: state.hours != 0 ||
+                              state.minutes != 0 ||
+                              state.seconds != 0
+                          ? Colors.blue
+                          : Colors.blue.shade200,
                       child: Icon(Icons.play_arrow),
                       onPressed: () {
-                        if (state['hours'] != 0 || state['minutes'] != 0 || state['seconds'] != 0 ) {
-                        context.read<TimerBloc>().add(TimerStarted(
-                            duration: context
-                                .read<PickerCubit>()
-                                .getTimeInSeconds()));
+                        if (state.hours != 0 ||
+                            state.minutes != 0 ||
+                            state.seconds != 0) {
+                          context.read<TimerBloc>().add(TimerStarted(
+                              duration: context
+                                  .read<PickerBloc>()
+                                  .getTimeInSeconds()));
                         }
                       },
                     );

@@ -1,8 +1,13 @@
+import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_timer/simple_bloc_observer.dart';
 import 'package:flutter_timer/timer/timer.dart';
 import 'package:flutter_timer/timer/view/timer_page.dart';
 
-void main() => runApp(const App());
+void main() {
+  Bloc.observer = SimpleBlocObserver();
+  runApp(const App());
+}
 
 class App extends StatelessWidget {
   const App({super.key});
