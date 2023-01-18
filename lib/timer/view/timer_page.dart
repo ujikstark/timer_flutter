@@ -43,6 +43,7 @@ class TimerView extends StatelessWidget {
                     width: 50,
                     height: 220,
                     child: ListWheelScrollView.useDelegate(
+                      key: const Key('hoursInput_listwheelscrollview'),
                       physics: const FixedExtentScrollPhysics(),
                       controller: FixedExtentScrollController(
                           initialItem: myPicker.state.hours != 0
@@ -66,6 +67,7 @@ class TimerView extends StatelessWidget {
                     width: 50,
                     height: 220,
                     child: ListWheelScrollView.useDelegate(
+                      key: const Key('minutesInput_listwheelscrollview'),
                       physics: const FixedExtentScrollPhysics(),
                       controller: FixedExtentScrollController(
                           initialItem: myPicker.state.minutes != 0
@@ -88,6 +90,7 @@ class TimerView extends StatelessWidget {
                     width: 50,
                     height: 220,
                     child: ListWheelScrollView.useDelegate(
+                      key: const Key('secondsInput_listwheelscrollview'),
                       physics: const FixedExtentScrollPhysics(),
                       controller: FixedExtentScrollController(
                           initialItem: myPicker.state.seconds != 0
@@ -173,24 +176,25 @@ class Actions extends StatelessWidget {
               if (state is TimerRunInProgress) ...[
                 FloatingActionButton(
                   child: Icon(Icons.pause),
-                  onPressed: () => context.read<TimerBloc>().add(TimerPaused()),
+                  onPressed: () => context.read<TimerBloc>().add(const TimerPaused()),
                 ),
                 FloatingActionButton(
                   child: Icon(Icons.rectangle),
-                  onPressed: () => context.read<TimerBloc>().add(TimerReset()),
+                  onPressed: () => context.read<TimerBloc>().add(const TimerReset()),
                 ),
               ],
               if (state is TimerRunPause) ...[
                 FloatingActionButton(
                   child: Icon(Icons.play_arrow),
                   onPressed: () =>
-                      context.read<TimerBloc>().add(TimerResumed()),
+                      context.read<TimerBloc>().add(const TimerResumed()),
                 ),
                 FloatingActionButton(
                   child: Icon(Icons.rectangle),
-                  onPressed: () => context.read<TimerBloc>().add(TimerReset()),
+                  onPressed: () => context.read<TimerBloc>().add(const TimerReset()),
                 ),
               ],
+              
             ],
           ),
         );
@@ -210,6 +214,7 @@ class TimePicker extends StatelessWidget {
       child: Center(
         child: Text(
           num < 10 ? '0' + num.toString() : num.toString(),
+          key: Key('item_${num}_text'),
           style: TextStyle(fontSize: 40),
         ),
       ),
